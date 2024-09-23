@@ -1,0 +1,302 @@
+body {
+    background: linear-gradient(to bottom, #0c0c0c, #1a1a1a); /* Dark gradient background */
+}
+
+.fade-in { 
+    opacity: 0;
+    transform: translateY(20vh);
+    visibility: hidden;
+    transition: opacity 0.6s ease-out, transform 1.2s ease-out;
+    will-change: opacity, visibility;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+}
+
+.homecontainer {
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px; 
+    height: 100vh;
+}
+
+.terminal-wrapper {
+    position: absolute;
+    top: 50px; /* Adjust these values to fit within your CRT frame */
+    left: 50px;
+    right: 50px;
+    bottom: 50px;
+    background-color: #000; /* Keep terminal background black */
+    border-radius: 10px;
+    overflow: hidden;
+    transform: perspective(1000px) rotateX(2deg) rotateY(-1deg);
+    transform-origin: center center;
+    box-shadow: none;
+    animation: none;
+}
+
+.terminal-wrapper.on {
+    box-shadow: 0 0 15px rgba(51, 255, 51, 0.3); /* Glow effect when on */
+    transform: perspective(1000px) rotateX(2deg) rotateY(-1deg);
+}
+
+/* Add this class to hide xterm screen content but keep the black background */
+.terminal-content {
+    position: absolute; /* Use absolute positioning */
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0; /* Ensure it fills the parent */
+    display: block;
+    width: 100%;
+    height: 100%;
+    color: #33ff33;
+    background-color: transparent;
+}
+
+.terminal-content.hidden {
+    opacity: 0;
+    visibility: hidden; /* Maintain the space */
+    transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+}
+
+@keyframes crtTurnOff {
+    0% {
+        opacity: 1;
+        transform: scaleY(1);
+        border: 4px solid transparent; /* No border initially */
+        box-shadow: none; /* No shadow initially */
+    }
+    50% {
+        transform: scaleY(0.05); /* Shrinking effect */
+        filter: brightness(0.5); /* Dim during the animation */
+        border: 4px solid #ff0000; /* Red border during the animation */
+        box-shadow: 0 0 20px #ff0000, 0 0 30px #ff0000; /* Red glow effect */
+    }
+    100% {
+        opacity: 0;
+        transform: scaleY(0); /* End at hidden state */
+        border: 4px solid transparent; /* Reset border at the end */
+        box-shadow: none; /* Reset shadow at the end */
+    }
+}
+
+@keyframes crtTurnOn {
+    0% {
+        opacity: 0;
+        transform: scaleY(0); /* Start from a hidden state */
+        border: 4px solid transparent; /* No border initially */
+        box-shadow: none; /* No shadow initially */
+    }
+    50% {
+        transform: scaleY(0.05); /* Slightly larger than the hidden state */
+        filter: brightness(1.5); /* Simulate the bright flash */
+        border: 4px solid #00ff00; /* Green border during the animation */
+        box-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00; /* Green glow effect */
+    }
+    100% {
+        opacity: 1;
+        transform: scaleY(1); /* End at full size */
+        filter: brightness(1); /* Return to normal brightness */
+        border: 4px solid transparent; /* Reset border at the end */
+        box-shadow: none; /* Reset shadow at the end */
+    }
+}
+
+.turn-on {
+    animation: crtTurnOn 0.8s forwards; /* Adjust timing as needed */
+}
+
+.turn-off {
+    animation: crtTurnOff 0.8s forwards; /* Adjust timing as needed */
+}
+
+.turn-on .terminal-content,
+.turn-off .terminal-content {
+    opacity: 0; /* Hide text during animation */
+}
+
+.terminal-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    animation: flicker 0.15s infinite;
+    z-index: 2;
+}
+
+.terminal-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.75) 100%);
+    pointer-events: none;
+}
+
+.terminalcontainer {
+    width: 640px; 
+    height: 480px; 
+    margin: 50px auto;
+    background-color: #000;
+    border-radius: 30px;
+    border: 20px solid #333;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.2), 0 0 50px rgba(0, 255, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    padding: 10px; 
+    transform: perspective(1000px) rotateX(2deg) rotateY(-1deg);
+    transform-origin: center center;
+}
+
+.toggle-button {
+    position: absolute;
+    bottom: 1rem;
+    right: 0.8rem;
+    width: 2rem;  
+    height: 2rem; 
+    border: 2px solid black;
+    border-radius: 50%;
+    cursor: pointer;
+    outline: none;
+    z-index: 15;
+    transition: box-shadow 0.3s ease, color 0.3s ease;
+    background-color: #1e1e1e; /* Set a default grey background */
+}
+
+.toggle-button i {
+    font-size: 24px;
+    color: lightgrey; /* Default icon color when off */
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.toggle-button.on {
+    border: 2px solid #1e3e1e; /* A more muted green color */
+}
+
+.toggle-button.on i {
+    fill: #33ff33; /* Green icon when on */
+    text-shadow: 0 0 5px #33ff33, 0 0 15px #33ff33; /* Apply glowing effect to the icon */
+}
+
+.toggle-button.off i {
+    color: lightgrey; /* Light grey icon when off */
+    text-shadow: none; /* No glow when off */
+}
+
+.xterm {
+    font-family: 'VT323', 'Courier New', monospace;
+    font-size: 1.5rem; /* Make text larger */
+    color: #66ff66; /* Brighter terminal text color */
+    text-shadow: 0 0 10px rgba(51, 255, 51, 1), 0 0 20px rgba(51, 255, 51, 0.5); /* Bright text glow */
+    line-height: 1.2;
+    letter-spacing: 0.05em;
+    padding: 10px; 
+    box-sizing: border-box; 
+}
+
+@keyframes flicker {
+    0% { opacity: 0.27861; }
+    5% { opacity: 0.34769; }
+    10% { opacity: 0.23604; }
+    15% { opacity: 0.90626; }
+    20% { opacity: 0.18128; }
+    25% { opacity: 0.83891; }
+    30% { opacity: 0.65583; }
+    35% { opacity: 0.67807; }
+    40% { opacity: 0.26559; }
+    45% { opacity: 0.84693; }
+    50% { opacity: 0.96019; }
+    55% { opacity: 0.08594; }
+    60% { opacity: 0.20313; }
+    65% { opacity: 0.71988; }
+    70% { opacity: 0.53455; }
+    75% { opacity: 0.37288; }
+    80% { opacity: 0.71428; }
+    85% { opacity: 0.70419; }
+    90% { opacity: 0.7003; }
+    95% { opacity: 0.36108; }
+    100% { opacity: 0.24387; }
+}
+
+@keyframes textShadow {
+    0% { text-shadow: 0.4389924193300864px 0 1px rgba(0,30,255,0.5), -0.4389924193300864px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    5% { text-shadow: 2.7928974010788217px 0 1px rgba(0,30,255,0.5), -2.7928974010788217px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    10% { text-shadow: 0.02956275843481219px 0 1px rgba(0,30,255,0.5), -0.02956275843481219px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    15% { text-shadow: 0.40218538552878136px 0 1px rgba(0,30,255,0.5), -0.40218538552878136px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    20% { text-shadow: 3.4794037899852017px 0 1px rgba(0,30,255,0.5), -3.4794037899852017px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    25% { text-shadow: 1.6125630401149584px 0 1px rgba(0,30,255,0.5), -1.6125630401149584px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    30% { text-shadow: 0.7015590085143956px 0 1px rgba(0,30,255,0.5), -0.7015590085143956px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    35% { text-shadow: 3.896914047650351px 0 1px rgba(0,30,255,0.5), -3.896914047650351px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    40% { text-shadow: 3.870905614848819px 0 1px rgba(0,30,255,0.5), -3.870905614848819px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    45% { text-shadow: 2.231056963361899px 0 1px rgba(0,30,255,0.5), -2.231056963361899px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    50% { text-shadow: 0.08084290417898504px 0 1px rgba(0,30,255,0.5), -0.08084290417898504px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    55% { text-shadow: 2.3758461067427543px 0 1px rgba(0,30,255,0.5), -2.3758461067427543px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    60% { text-shadow: 2.202193051050636px 0 1px rgba(0,30,255,0.5), -2.202193051050636px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    65% { text-shadow: 2.8638780614874975px 0 1px rgba(0,30,255,0.5), -2.8638780614874975px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    70% { text-shadow: 0.48874025155497314px 0 1px rgba(0,30,255,0.5), -0.48874025155497314px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    75% { text-shadow: 1.8948491305757957px 0 1px rgba(0,30,255,0.5), -1.8948491305757957px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    80% { text-shadow: 0.0833037308038857px 0 1px rgba(0,30,255,0.5), -0.0833037308038857px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    85% { text-shadow: 0.09769827255241735px 0 1px rgba(0,30,255,0.5), -0.09769827255241735px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    90% { text-shadow: 3.443339761481782px 0 1px rgba(0,30,255,0.5), -3.443339761481782px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    95% { text-shadow: 2.1841838852799786px 0 1px rgba(0,30,255,0.5), -2.1841838852799786px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+    100% { text-shadow: 2.6208764473832513px 0 1px rgba(0,30,255,0.5), -2.6208764473832513px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+}
+
+.xterm-screen {
+    animation: textShadow 1.6s infinite;
+}
+
+/* Remove scrollbar */
+.xterm .xterm-viewport {
+    overflow: hidden !important;
+}
+
+@font-face {
+    font-family: 'VT323';
+    src: url('https://fonts.gstatic.com/s/vt323/v17/pxiKyp0ihIEF2hsYHpT2dkNE.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.crt-monitor {
+    position: relative;
+    width: 70vw; /* Use a percentage of the viewport width */
+    max-width: 800px; /* Set a max width */
+    height: auto; /* Allow height to adjust automatically */
+    aspect-ratio: 4 / 3; /* Maintain a 4:3 aspect ratio */
+    margin: 50px auto;
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.5), /* Outer shadow for depth */
+        inset 0 0 15px rgba(255, 255, 255, 0.1); /* Inner shadow for inset effect */
+    border-radius: 0.5rem;
+    border: 5px solid transparent; /* Transparent to avoid color clash */
+    background-image: linear-gradient(#1e1e1e, #1e1e1e), /* Base color */
+                      linear-gradient(to right, #333, #555); /* Gradient for depth */
+    background-clip: border-box; /* Clip the background to the border */
+    z-index: 1; /* Ensure it's above other elements */
+}
+
+.crt-monitor.off {
+    background-color: #1a1a1a; /* Darker gray for off state */
+}
+
+.crt-monitor.on {
+    background-color: #2e2e2e; /* Brighter gray for on state */
+}
+
+
+
+

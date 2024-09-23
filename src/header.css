@@ -1,0 +1,42 @@
+* {
+    box-sizing: border-box; /* Ensures padding and borders are included in the element's width */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -3.3rem;
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    top: 0;
+    width: 100%; /* Ensures the header spans the entire width */
+    z-index: 1000;
+}
+
+body {
+    margin: 0;
+}
+
+.name {
+    font-size: 24px;
+}
+
+.navbar .nav-links {
+    display: flex; /* Aligns the list items horizontally */
+    gap: 20px; /* Creates space between the nav links */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar .nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.navbar .nav-links a:hover {
+    text-decoration: underline;
+}
